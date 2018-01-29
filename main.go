@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/subtle"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -23,12 +24,12 @@ func main() {
 		}
 	})
 
-	apiKey := os.Getenv("RSIGN_API_KEY")
+	apiKey := []byte(os.Getenv("RSIGN_API_KEY"))
 	router.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		m.HandleRequest(w, r)
 	})
 	router.Post("/", func(w http.ResponseWriter, r *http.Request) {
-		if r.Header.Get("X-API-Key") != apiKey {
+		if subtle.ConstantTimeCompare(apiKey, []byte(r.Header.Get("X-API-Key"))) != 1 {
 			render.Status(r, 401)
 			render.PlainText(w, r, "Invalid API key")
 			return
