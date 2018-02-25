@@ -12,4 +12,5 @@ Environment variables
 Building
 ==
 
+    dep ensure
     go build main.go
